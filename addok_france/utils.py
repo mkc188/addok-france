@@ -46,7 +46,7 @@ FOLD_PATTERN = re.compile(r'^(\d{1,4})(' + ORDINAL_REGEX + ')$',
 
 # Match number once cleaned by glue_ordinal and fold_ordinal (for example
 # "6b", "234t"…)
-NUMBER_PATTERN = re.compile(r'\b\d{1,4}[a-z]?\b', flags=re.IGNORECASE)
+NUMBER_PATTERN = re.compile(r'\b\d{1,4}[a-z]?(Hao)?\b', flags=re.IGNORECASE)
 
 
 def clean_query(q):
@@ -107,9 +107,12 @@ def flag_housenumber(tokens):
     # Only keep first match (avoid noise in the middle of the search query).
     found = False
     for previous, token, next_ in neighborhood(tokens):
-        if ((token.is_first or (next_ and TYPES_PATTERN.match(next_)))
+        raw = '{}'.format(token)
+        isEndsWithHao = raw.endswith('Hao')
+        if (((token.is_first and not isEndsWithHao) or (not next_ and isEndsWithHao) or (next_ and TYPES_PATTERN.match(next_)))
                 and NUMBER_PATTERN.match(token) and not found):
             token.kind = 'housenumber'
+            token = token.update(raw.replace('Hao', ''))
             found = True
         yield token
 
