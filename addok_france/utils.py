@@ -144,7 +144,10 @@ def make_labels(helper, result):
     def add(labels, label):
         labels.insert(0, label)
         if housenumber:
-            label = '{} {}'.format(housenumber, label)
+            if result.lang == 'zh':
+                label = '{}{}號'.format(label, housenumber)
+            else:
+                label = '{} {}'.format(housenumber, label)
             labels.insert(0, label)
 
     city = result.city
